@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/incomeFragment"
+        android:name="com.intelliatech.mvvmdemo.views.IncomeFragment"
+        android:label="fragment_income"
+        tools:layout="@layout/fragment_income">
+        <action
+            android:id="@+id/action_incomeFragment_to_createFragment"
+            app:destination="@id/createFragment" />
+        <action
+            android:id="@+id/action_incomeFragment_to_expensesFragment2"
+            app:destination="@id/expensesFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/createFragment"
+        android:name="com.intelliatech.mvvmdemo.views.CreateFragment"
+        android:label="fragment_create"
+        tools:layout="@layout/fragment_create">
+        <action
+            android:id="@+id/action_createFragment_to_incomeFragment"
+            app:destination="@id/incomeFragment" />
+        <action
+            android:id="@+id/action_createFragment_to_expensesFragment2"
+            app:destination="@id/expensesFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/expensesFragment2"
+        android:name="com.intelliatech.mvvmdemo.views.ExpensesFragment"
+        android:label="fragment_expenses"
+        tools:layout="@layout/fragment_expenses">
+        <action
+            android:id="@+id/action_expensesFragment2_to_createFragment"
+            app:destination="@id/createFragment" />
+        <action
+            android:id="@+id/action_expensesFragment2_to_incomeFragment"
+            app:destination="@id/incomeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.intelliatech.mvvmdemo.views.HomeFragment"
+        tools:layout="@layout/fragment_home"
+
+        >
+        <action
+            android:id="@+id/action_homeFragment_to_incomeFragment"
+            app:destination="@id/incomeFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_expensesFragment2"
+            app:destination="@id/expensesFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.intelliatech.mvvmdemo.views.SplashFragment"
+        android:label="SplashFragment">
+        <action
+            android:id="@+id/action_splashFragment_to_incomeFragment"
+            app:destination="@id/incomeFragment" />
+    </fragment>
+</navigation>

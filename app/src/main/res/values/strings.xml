@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MVVMDEMO</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="txt_sort_by_date">Sort By Date</string>
+    <string name="txt_total_income">Total Income</string>
+    <string name="txt_total_expenses">Total Expenses</string>
+    <string name="txt_total_balance">Total Balance</string>
+    <string name="txt_payment_method">Payment method</string>
+    <string name="txt_search">Search</string>
+    <string name="txt_income_fragment">Income</string>
+    <string name="txt_expenses_fragment">Expenses</string>
+</resources>
