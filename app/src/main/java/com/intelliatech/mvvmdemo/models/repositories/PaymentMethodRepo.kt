@@ -17,7 +17,6 @@ class PaymentMethodRepo {
         fun insertPaymentMethod(context: Context, paymentMethodList: List<PaymentMethodEntity>) {
 
             CoroutineScope(IO).launch {
-
                 DatabaseHelper.initializeDB(context)!!.paymentMethodDao()
                     .insertAllPaymentMethod(paymentMethodList)
             }
@@ -25,7 +24,8 @@ class PaymentMethodRepo {
 
 
         fun getPaymentMethodList(context: Context): LiveData<List<PaymentMethodEntity>>? {
-            paymentMethodList = DatabaseHelper.initializeDB(context)!!.paymentMethodDao().getAllPaymentMethod()
+            paymentMethodList =
+                DatabaseHelper.initializeDB(context)!!.paymentMethodDao().getAllPaymentMethod()
             return paymentMethodList
         }
     }

@@ -1,4 +1,4 @@
-package com.intelliatech.mvvmdemo.views
+package com.intelliatech.mvvmdemo.views.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,7 +6,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import com.intelliatech.mvvmdemo.R
 
 class MainActivity : AppCompatActivity() {
@@ -22,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
-        navController = navHostFragment.navController
+        navController   = navHostFragment.navController
 //        toolbar = findViewById(R.id.toolbar)
 //        appBarConfig = AppBarConfiguration(navController.graph)
 //        toolbar.setupWithNavController(navController,appBarConfig)

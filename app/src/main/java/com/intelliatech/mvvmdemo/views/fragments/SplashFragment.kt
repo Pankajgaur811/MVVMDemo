@@ -1,8 +1,9 @@
-package com.intelliatech.mvvmdemo.views
+package com.intelliatech.mvvmdemo.views.fragments
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.FragmentSplashBinding
+import com.intelliatech.mvvmdemo.models.prefrencesManager.SharePreferenceManager
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.ExpensesCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
@@ -22,6 +24,8 @@ import java.lang.IllegalStateException
 
 class SplashFragment : Fragment() {
 
+    private val TAG: String? ="SplashFragment"
+    private lateinit var prefManager: SharePreferenceManager
     private lateinit var paymentMethodViewModel: PaymentMethodViewModel
     private lateinit var expensesCategoryViewModel: ExpensesCategoryViewModel
     private lateinit var incomeCategoryViewmodel: IncomeCategoryViewModel
@@ -48,14 +52,18 @@ class SplashFragment : Fragment() {
         varInitialize()
 
 
-        insertIncomeCategoryData()
-        insertExpensesCategoryData()
-        insertPaymentMethodData()
+        if (!prefManager.getFirstLaunchStatus()) {
+            prefManager.setFirstLaunchStatus(true)
+            Log.d(TAG,"First time Data inserted")
+            insertIncomeCategoryData()
+            insertExpensesCategoryData()
+            insertPaymentMethodData()
+        }
         gotoIncomeFragment()
     }
 
     private fun varInitialize() {
-
+        prefManager = SharePreferenceManager(requireContext())
         incomeCategoryViewmodel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
         expensesCategoryViewModel =
             ViewModelProvider(this).get(ExpensesCategoryViewModel::class.java)

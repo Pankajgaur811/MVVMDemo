@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id "androidx.navigation.safeargs"
     id 'kotlin-kapt'
+    id 'kotlin-android-extensions'
+
 }
 
 android {
@@ -16,6 +18,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    // Add for using latest experimental build of Android Extensions
+    androidExtensions {
+        experimental = true
     }
     dataBinding {
         enabled true
@@ -85,5 +91,8 @@ dependencies {
 
 
     implementation 'com.facebook.stetho:stetho:1.5.1'
+
+// progress bar
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
 }

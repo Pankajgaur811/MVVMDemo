@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/incomeFragment"
-        android:name="com.intelliatech.mvvmdemo.views.IncomeFragment"
+        android:name="com.intelliatech.mvvmdemo.views.fragments.IncomeFragment"
         android:label="fragment_income"
         tools:layout="@layout/fragment_income">
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/createFragment"
-        android:name="com.intelliatech.mvvmdemo.views.CreateFragment"
+        android:name="com.intelliatech.mvvmdemo.views.fragments.CreateFragment"
         android:label="fragment_create"
         tools:layout="@layout/fragment_create">
         <action
@@ -28,10 +28,19 @@
         <action
             android:id="@+id/action_createFragment_to_expensesFragment2"
             app:destination="@id/expensesFragment2" />
+        <argument
+            android:name="viewType"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="getData"
+            android:defaultValue="@null"
+            app:argType="com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/expensesFragment2"
-        android:name="com.intelliatech.mvvmdemo.views.ExpensesFragment"
+        android:name="com.intelliatech.mvvmdemo.views.fragments.ExpensesFragment"
         android:label="fragment_expenses"
         tools:layout="@layout/fragment_expenses">
         <action
@@ -42,21 +51,8 @@
             app:destination="@id/incomeFragment" />
     </fragment>
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.intelliatech.mvvmdemo.views.HomeFragment"
-        tools:layout="@layout/fragment_home"
-
-        >
-        <action
-            android:id="@+id/action_homeFragment_to_incomeFragment"
-            app:destination="@id/incomeFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_expensesFragment2"
-            app:destination="@id/expensesFragment2" />
-    </fragment>
-    <fragment
         android:id="@+id/splashFragment"
-        android:name="com.intelliatech.mvvmdemo.views.SplashFragment"
+        android:name="com.intelliatech.mvvmdemo.views.fragments.SplashFragment"
         android:label="SplashFragment">
         <action
             android:id="@+id/action_splashFragment_to_incomeFragment"

@@ -7,7 +7,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".views.IncomeFragment">
+        tools:context=".views.fragments.IncomeFragment">
 
         <include
             android:id="@+id/tab_layout"
@@ -79,7 +79,6 @@
             android:id="@+id/rv_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

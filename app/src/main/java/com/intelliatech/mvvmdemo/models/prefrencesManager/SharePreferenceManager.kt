@@ -10,8 +10,7 @@ class SharePreferenceManager(context: Context) {
     private val preference: SharedPreferences
         get() = PreferenceManager.getDefaultSharedPreferences(appContext)
 
-
-    fun firstLaunch(launch: Boolean) {
+    fun setFirstLaunchStatus(launch: Boolean) {
         preference.edit().putBoolean(FIRST_TIME_LAUNCH, launch).apply()
     }
 

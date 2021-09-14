@@ -17,7 +17,7 @@ import kotlinx.coroutines.*
 
 @Database(
     entities = [IncomeCategoryEntity::class, ExpensesCategoryEntity::class, IncomeExpensesEntity::class, PaymentMethodEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class IncomeExpensesDatabase : RoomDatabase() {
