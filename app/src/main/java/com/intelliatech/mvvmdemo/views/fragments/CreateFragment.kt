@@ -20,10 +20,10 @@ import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.FragmentCreateBinding
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
 import com.intelliatech.mvvmdemo.models.utils.UtilityHelper
-import com.intelliatech.mvvmdemo.viewmodel.ExpensesCategoryViewModel
+import com.intelliatech.mvvmdemo.viewmodel.ExpensesCategoryVM
 import com.intelliatech.mvvmdemo.viewmodel.IncomeCategoryViewModel
 import com.intelliatech.mvvmdemo.viewmodel.IncomeExpensesViewModel
-import com.intelliatech.mvvmdemo.viewmodel.PaymentMethodViewModel
+import com.intelliatech.mvvmdemo.viewmodel.PaymentVM
 import java.util.*
 
 
@@ -31,6 +31,9 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener, View.OnClickListener {
     private var incomeExpensesEntity: IncomeExpensesEntity? = null
     private var incomeExpensesViewModel: IncomeExpensesViewModel? = null
+    private var incomeCategoryViewModel: IncomeCategoryViewModel? = null
+    private var expensesCategoryViewModel: ExpensesCategoryVM? = null
+    private var paymentVM: PaymentVM? = null
     private var dateInMiliSecond: String = ""
     private var time: String = ""
     private var viewType: Int = 0
@@ -38,9 +41,6 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private val args: CreateFragmentArgs by navArgs()
     private val TAG: String? = "CreateFragment"
     private var paymentMode: String = ""
-    private var expensesCategoryViewModel: ExpensesCategoryViewModel? = null
-    private var paymentMethodViewModel: PaymentMethodViewModel? = null
-    private var incomecategoryViewModel: IncomeCategoryViewModel? = null
 
     //    private var paymentMethodList: MutableList<PaymentMethodEntity>? = null
     var paymentMethodList = arrayListOf<String>()
@@ -140,16 +140,19 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     }
 
     private fun initVar() {
-        incomecategoryViewModel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
-        paymentMethodViewModel = ViewModelProvider(this).get(PaymentMethodViewModel::class.java)
-        expensesCategoryViewModel =
-            ViewModelProvider(this).get(ExpensesCategoryViewModel::class.java)
+
         incomeExpensesViewModel = ViewModelProvider(this).get(IncomeExpensesViewModel::class.java)
+        incomeCategoryViewModel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
+        paymentVM = ViewModelProvider(this).get(PaymentVM::class.java)
+        expensesCategoryViewModel = ViewModelProvider(this).get(ExpensesCategoryVM::class.java)
+
+
     }
 
     private fun initView() {
-        setClickListenersEvent()
         initVar()
+        setClickListenersEvent()
+
         setScreenTitle()
         fetchData()
     }
@@ -266,7 +269,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     private fun getPaymentMethodData() {
         context?.let {
-            paymentMethodViewModel?.getAllPaymentMethodList(it)
+            paymentVM?.getAllPaymentMethodList()
                 ?.observe(viewLifecycleOwner, Observer {
 
                     if (it != null) {
@@ -290,36 +293,33 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
     private fun getExpensesCategoryData() {
-        context?.let {
-            expensesCategoryViewModel?.getExpensesCategoryListt(it)
-                ?.observe(viewLifecycleOwner, Observer {
-                    if (it != null) {
-
-                        for (i in it) {
-
-                            categoryList.add(i.category_name)
-                        }
-                    } else
-                        Log.d(TAG, "payment data is not available" + it.toString())
-                    Log.d(TAG, "Expenses category data" + categoryList.toString())
-                    addCategorySpinner()
-                }
-                )
-        }
-    }
-
-    private fun getIncomeCategoryData() {
-        context?.let { incomecategoryViewModel?.getIncomeCategoryList(it) }!!
-            .observe(viewLifecycleOwner, Observer {
+        expensesCategoryViewModel?.getExpensesCategoryAllList()
+            ?.observe(viewLifecycleOwner, Observer {
                 if (it != null) {
 
                     for (i in it) {
 
-                        categoryList.add(i.categotry_name)
+                        categoryList.add(i.category_name)
                     }
                 } else
                     Log.d(TAG, "payment data is not available" + it.toString())
-                Log.d(TAG, "income category data" + categoryList.toString())
+                Log.d(TAG, "Expenses category data" + categoryList.toString())
+                addCategorySpinner()
+            }
+            )
+    }
+
+
+    private fun getIncomeCategoryData() {
+        incomeCategoryViewModel?.getIncomeCategoryList()
+            ?.observe(viewLifecycleOwner, Observer {
+                if (it != null) {
+
+                    for (i in it) {
+                        categoryList.add(i.categotry_name)
+                    }
+                } else
+                    Log.d(TAG, "income category data" + categoryList.toString())
                 addCategorySpinner()
             }
 
@@ -351,7 +351,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     }
 
     private fun deleteData() {
-        incomeExpensesEntity?.let { incomeExpensesViewModel?.deleteRecord(requireContext(), it) }
+        incomeExpensesEntity?.let { incomeExpensesViewModel?.deleteRecord(it) }
         previousFragment()
     }
 
@@ -383,7 +383,6 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         var valueEffect =
             incomeExpensesEntity?.let {
                 incomeExpensesViewModel?.updateRecord(
-                    requireContext(),
                     it
                 )
             }
@@ -429,7 +428,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             binding.atvCategoryList.text.toString(),
             paymentMode, dateInMiliSecond, time, binding.etDescription.text.toString(), viewType
         )
-        incomeExpensesViewModel?.insertRecord(requireContext(), incomeExpensesEntity)
+        incomeExpensesViewModel?.insertRecord(incomeExpensesEntity)
         previousFragment()
     }
 

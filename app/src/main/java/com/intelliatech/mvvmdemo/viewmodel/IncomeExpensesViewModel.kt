@@ -1,61 +1,90 @@
 package com.intelliatech.mvvmdemo.viewmodel
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import com.intelliatech.mvvmdemo.models.repositories.IncomeExpensesRepos
+import androidx.lifecycle.viewModelScope
+import com.intelliatech.mvvmdemo.models.repositories.ExpensesCategoryRepo
+import com.intelliatech.mvvmdemo.models.repositories.IncomeExpensesRepo
+import com.intelliatech.mvvmdemo.models.repositories.PaymentMethodRepo
+import com.intelliatech.mvvmdemo.models.roomDatabase.DatabaseHelper
+import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
+import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class IncomeExpensesViewModel : ViewModel() {
+class IncomeExpensesViewModel(application: Application) : AndroidViewModel(application) {
+    private var incomeExpensesRepo: IncomeExpensesRepo? = null
     var totalAmount: LiveData<Int>? = null
     var totalExpenses: LiveData<Int>? = null
     var totalIncome: LiveData<Int>? = null
-
     var incomeExpensesList: LiveData<List<IncomeExpensesEntity>>? = null
 
-    fun insertRecord(context: Context, incomeExpensesEntity: IncomeExpensesEntity) {
-        IncomeExpensesRepos.insertRecord(context, incomeExpensesEntity)
+
+    init {
+        val db = DatabaseHelper.initializeDB(application)
+        incomeExpensesRepo = IncomeExpensesRepo(db.incomeExpensesDao())
     }
 
-    fun updateRecord(context: Context, incomeExpensesEntity: IncomeExpensesEntity): Int {
-        return IncomeExpensesRepos.updateRecord(context, incomeExpensesEntity)
+    fun insertRecord(incomeExpensesEntity: IncomeExpensesEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            incomeExpensesRepo?.insertRecord(incomeExpensesEntity)
+        }
     }
 
-    fun getAllRecordList(context: Context, viewType: Int): LiveData<List<IncomeExpensesEntity>>? {
-        incomeExpensesList = IncomeExpensesRepos.getIncomeExpeneseCategoryList(context, viewType)
+
+    fun updateRecord(incomeExpensesEntity: IncomeExpensesEntity): Int {
+        var value = 0
+
+        viewModelScope.launch(Dispatchers.IO)
+        {
+            value = incomeExpensesRepo?.updateRecord(incomeExpensesEntity)!!
+        }
+
+        return value
+    }
+
+    fun getAllRecordList(viewType: Int): LiveData<List<IncomeExpensesEntity>>? {
+        incomeExpensesList = incomeExpensesRepo?.getIncomeExpensesRecordList(viewType)
         return incomeExpensesList
     }
 
     fun getDataBetweenTwoDates(
-        context: Context,
         start_date: String,
         end_date: String,
         viewType: Int
     ): LiveData<List<IncomeExpensesEntity>>? {
         incomeExpensesList =
-            IncomeExpensesRepos.getDataInBetweenDates(context, start_date, end_date, viewType)
+            incomeExpensesRepo?.getDataInBetweenDates(start_date, end_date, viewType)
         return incomeExpensesList
 
     }
 
-    fun deleteRecord(context: Context, incomeExpensesEntity: IncomeExpensesEntity) {
-        IncomeExpensesRepos.deleteRecord(context, incomeExpensesEntity)
+    fun deleteRecord(incomeExpensesEntity: IncomeExpensesEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            incomeExpensesRepo?.deleteRecord(incomeExpensesEntity)
+        }
+
+
     }
 
-    fun getTotalAmount(context: Context, viewType: Int): LiveData<Int>? {
+    fun getTotalAmount(viewType: Int): LiveData<Int>? {
 
         when (viewType) {
             0 -> {
-                totalIncome = IncomeExpensesRepos.getTotalAmount(context, viewType)
+                totalIncome = incomeExpensesRepo?.getTotalAmount(viewType)
                 return totalIncome
             }
             1 -> {
-                totalExpenses = IncomeExpensesRepos.getTotalAmount(context, viewType)
+                totalExpenses =  incomeExpensesRepo?.getTotalAmount(viewType)
                 return totalExpenses
             }
         }
         return totalIncome
     }
+
 
 
 }

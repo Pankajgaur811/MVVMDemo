@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.intelliatech.mvvmdemo.R
@@ -17,23 +17,21 @@ import com.intelliatech.mvvmdemo.models.prefrencesManager.SharePreferenceManager
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.ExpensesCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
-import com.intelliatech.mvvmdemo.viewmodel.ExpensesCategoryViewModel
+import com.intelliatech.mvvmdemo.viewmodel.ExpensesCategoryVM
 import com.intelliatech.mvvmdemo.viewmodel.IncomeCategoryViewModel
-import com.intelliatech.mvvmdemo.viewmodel.PaymentMethodViewModel
-import java.lang.IllegalStateException
+import com.intelliatech.mvvmdemo.viewmodel.PaymentVM
 
 class SplashFragment : Fragment() {
 
-    private val TAG: String? ="SplashFragment"
+    private val TAG: String? = "SplashFragment"
     private lateinit var prefManager: SharePreferenceManager
-    private lateinit var paymentMethodViewModel: PaymentMethodViewModel
-    private lateinit var expensesCategoryViewModel: ExpensesCategoryViewModel
+    private lateinit var paymentMethodViewModel: PaymentVM
+    private lateinit var expensesCategoryViewModel: ExpensesCategoryVM
     private lateinit var incomeCategoryViewmodel: IncomeCategoryViewModel
     private lateinit var binding: FragmentSplashBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-
         }
     }
 
@@ -54,7 +52,7 @@ class SplashFragment : Fragment() {
 
         if (!prefManager.getFirstLaunchStatus()) {
             prefManager.setFirstLaunchStatus(true)
-            Log.d(TAG,"First time Data inserted")
+            Log.d(TAG, "First time Data inserted")
             insertIncomeCategoryData()
             insertExpensesCategoryData()
             insertPaymentMethodData()
@@ -66,8 +64,8 @@ class SplashFragment : Fragment() {
         prefManager = SharePreferenceManager(requireContext())
         incomeCategoryViewmodel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
         expensesCategoryViewModel =
-            ViewModelProvider(this).get(ExpensesCategoryViewModel::class.java)
-        paymentMethodViewModel = ViewModelProvider(this).get(PaymentMethodViewModel::class.java)
+            ViewModelProvider(this).get(ExpensesCategoryVM::class.java)
+        paymentMethodViewModel = ViewModelProvider(this).get(PaymentVM::class.java)
     }
 
     private fun insertPaymentMethodData() {
@@ -89,7 +87,7 @@ class SplashFragment : Fragment() {
             paymentMethodEntity6
         )
 
-        paymentMethodViewModel.insertPaymentMethodList(requireContext(), paymentMethodList)
+        paymentMethodViewModel.insertPaymentMethodList(paymentMethodList)
     }
 
     private fun insertExpensesCategoryData() {
@@ -104,7 +102,7 @@ class SplashFragment : Fragment() {
             expensesCategoryEntity4
 
         )
-        expensesCategoryViewModel.insertAllData(requireContext(), expensesCategoryList)
+        expensesCategoryViewModel.insertExpensesCategoryList(expensesCategoryList)
     }
 
     private fun gotoIncomeFragment() {
@@ -130,7 +128,7 @@ class SplashFragment : Fragment() {
             incomeCategoryEntity3,
             incomeCategoryEntity4
         )
-        incomeCategoryViewmodel.insertAllData(requireContext(), incomeCategoryEntityList)
+        incomeCategoryViewmodel.insertIncomeCategoryList(incomeCategoryEntityList)
     }
 
     companion object {

@@ -6,8 +6,6 @@ class DatabaseHelper {
 
     companion object {
 
-        var incomeExpensesDatabase: IncomeExpensesDatabase? = null
-
         fun initializeDB(context: Context): IncomeExpensesDatabase {
             return IncomeExpensesDatabase.getInstance(context)
         }

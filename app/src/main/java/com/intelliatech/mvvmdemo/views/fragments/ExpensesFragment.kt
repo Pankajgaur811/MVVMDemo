@@ -85,7 +85,7 @@ class ExpensesFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDa
     }
 
     private fun getTotalExpenses() {
-        incomeExpensesViewModel?.getTotalAmount(requireContext(), viewType)
+        incomeExpensesViewModel?.getTotalAmount(viewType)
             ?.observe(viewLifecycleOwner,
                 androidx.lifecycle.Observer {
                     if (it != null) {
@@ -99,7 +99,7 @@ class ExpensesFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDa
     }
 
     private fun getTotalIncome() {
-        incomeExpensesViewModel?.getTotalAmount(requireContext(), 0)?.observe(viewLifecycleOwner,
+        incomeExpensesViewModel?.getTotalAmount(0)?.observe(viewLifecycleOwner,
             androidx.lifecycle.Observer {
                 if (it != null) {
                     Log.d(TAG, "total Income " + it)
@@ -113,7 +113,7 @@ class ExpensesFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDa
     }
 
     private fun fetchExpensesList() {
-        incomeExpensesViewModel?.getAllRecordList(requireContext(), viewType)
+        incomeExpensesViewModel?.getAllRecordList(viewType)
             ?.observe(viewLifecycleOwner,
                 androidx.lifecycle.Observer {
                     Log.d(TAG, "Ecxpenses data" + it.toString())
@@ -217,7 +217,7 @@ class ExpensesFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDa
             if (end_date != null) {
 
                 incomeExpensesViewModel?.getDataBetweenTwoDates(
-                    requireContext(),
+
                     start_date,
                     end_date, viewType
                 )?.observe(viewLifecycleOwner,

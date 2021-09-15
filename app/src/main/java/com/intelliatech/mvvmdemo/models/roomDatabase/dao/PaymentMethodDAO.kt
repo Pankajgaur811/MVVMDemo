@@ -9,8 +9,6 @@ import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
 
 @Dao
 interface PaymentMethodDAO {
-
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllPaymentMethod(paymentMethodEntityList: List<PaymentMethodEntity>)
 
