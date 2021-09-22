@@ -3,9 +3,7 @@ package com.intelliatech.mvvmdemo.views.dataAdapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.SingleIncomeExpensesCardLayoutBinding
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
 import com.intelliatech.mvvmdemo.models.utils.UtilityHelper
@@ -16,14 +14,11 @@ class IncomeExpensesListDataAdapter(
     var incomeExpensesEntityList: List<IncomeExpensesEntity>,
     var singleClickEventList: SingleClickEventList
 ) : RecyclerView.Adapter<IncomeExpensesListDataAdapter.IncomeExpensesListVH>() {
-
-    private var count: Int = 1
     lateinit var binding: SingleIncomeExpensesCardLayoutBinding
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IncomeExpensesListVH {
 
-        binding = DataBindingUtil.inflate(
+        binding = SingleIncomeExpensesCardLayoutBinding.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.single_income_expenses_card_layout,
             parent,
             false
         )
@@ -46,8 +41,6 @@ class IncomeExpensesListDataAdapter(
                 binding.root
             )
         }
-
-
     }
 
     override fun getItemCount(): Int {

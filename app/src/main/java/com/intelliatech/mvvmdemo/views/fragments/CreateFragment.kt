@@ -10,8 +10,8 @@ import android.view.View
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
@@ -19,21 +19,26 @@ import androidx.navigation.fragment.navArgs
 import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.FragmentCreateBinding
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
+import com.intelliatech.mvvmdemo.models.utils.MyApplication
 import com.intelliatech.mvvmdemo.models.utils.UtilityHelper
-import com.intelliatech.mvvmdemo.viewmodel.ExpensesCategoryVM
-import com.intelliatech.mvvmdemo.viewmodel.IncomeCategoryViewModel
-import com.intelliatech.mvvmdemo.viewmodel.IncomeExpensesViewModel
-import com.intelliatech.mvvmdemo.viewmodel.PaymentVM
+import com.intelliatech.mvvmdemo.viewmodel.*
 import java.util.*
 
 
 class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener, View.OnClickListener {
+
     private var incomeExpensesEntity: IncomeExpensesEntity? = null
-    private var incomeExpensesViewModel: IncomeExpensesViewModel? = null
-    private var incomeCategoryViewModel: IncomeCategoryViewModel? = null
-    private var expensesCategoryViewModel: ExpensesCategoryVM? = null
-    private var paymentVM: PaymentVM? = null
+    private val incomeExpensesViewModel: IncomeExpensesViewModel by viewModels {
+        IncomeExpensesViewModelFactory(
+            MyApplication?.getAppInstance()?.incomeRepo,
+            MyApplication?.getAppInstance()?.expensesRepo,
+            MyApplication?.getAppInstance()?.paymentRepo,
+            MyApplication?.getAppInstance()?.incomeExpenseRepo
+        )
+
+    }
+
     private var dateInMiliSecond: String = ""
     private var time: String = ""
     private var viewType: Int = 0
@@ -59,7 +64,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_create, container, false)
+        binding = FragmentCreateBinding.inflate(inflater,container, false)
         viewType = args.viewType
         if (args.getData != null) {
             incomeExpensesEntity = args.getData
@@ -141,10 +146,10 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     private fun initVar() {
 
-        incomeExpensesViewModel = ViewModelProvider(this).get(IncomeExpensesViewModel::class.java)
-        incomeCategoryViewModel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
-        paymentVM = ViewModelProvider(this).get(PaymentVM::class.java)
-        expensesCategoryViewModel = ViewModelProvider(this).get(ExpensesCategoryVM::class.java)
+//        incomeExpensesViewModel = ViewModelProvider(this).get(IncomeExpensesViewModel::class.java)
+//        incomeCategoryViewModel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
+//        paymentVM = ViewModelProvider(this).get(PaymentVM::class.java)
+//        expensesCategoryViewModel = ViewModelProvider(this).get(ExpensesCategoryVM::class.java)
 
 
     }
@@ -269,7 +274,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     private fun getPaymentMethodData() {
         context?.let {
-            paymentVM?.getAllPaymentMethodList()
+            incomeExpensesViewModel?.getAllPaymentMethodList()
                 ?.observe(viewLifecycleOwner, Observer {
 
                     if (it != null) {
@@ -293,7 +298,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
     private fun getExpensesCategoryData() {
-        expensesCategoryViewModel?.getExpensesCategoryAllList()
+        incomeExpensesViewModel?.getExpensesCategoryAllList()
             ?.observe(viewLifecycleOwner, Observer {
                 if (it != null) {
 
@@ -311,7 +316,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
     private fun getIncomeCategoryData() {
-        incomeCategoryViewModel?.getIncomeCategoryList()
+        incomeExpensesViewModel?.getIncomeCategoryList()
             ?.observe(viewLifecycleOwner, Observer {
                 if (it != null) {
 
@@ -394,22 +399,17 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         when (viewType) {
             0 -> {
                 try {
-                    Navigation.findNavController(binding.root)
-                        .navigate(R.id.action_createFragment_to_incomeFragment)
+                    Navigation.findNavController(binding.root).navigate(R.id.action_createFragment_to_incomeFragment)
                 } catch (e: Exception) {
                     Log.d(TAG, "excption :- ${e.message}")
-
                 }
             }
             1 -> {
                 try {
-                    Navigation.findNavController(binding.root)
-                        .navigate(R.id.action_createFragment_to_expensesFragment2)
+                    Navigation.findNavController(binding.root).navigate(R.id.action_createFragment_to_expensesFragment2)
                 } catch (e: Exception) {
                     Log.d(TAG, "excption :- ${e.message}")
-
                 }
-
             }
 
         }

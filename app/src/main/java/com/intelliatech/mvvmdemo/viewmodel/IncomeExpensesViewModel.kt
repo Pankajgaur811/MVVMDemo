@@ -1,31 +1,30 @@
 package com.intelliatech.mvvmdemo.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.intelliatech.mvvmdemo.models.repositories.ExpensesCategoryRepo
+import com.intelliatech.mvvmdemo.models.repositories.IncomeCategoryRepo
 import com.intelliatech.mvvmdemo.models.repositories.IncomeExpensesRepo
 import com.intelliatech.mvvmdemo.models.repositories.PaymentMethodRepo
-import com.intelliatech.mvvmdemo.models.roomDatabase.DatabaseHelper
+import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.ExpensesCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class IncomeExpensesViewModel(application: Application) : AndroidViewModel(application) {
-    private var incomeExpensesRepo: IncomeExpensesRepo? = null
+class IncomeExpensesViewModel(
+    val incomeCategoryRepo: IncomeCategoryRepo?,
+    val expensesCategoryRepo: ExpensesCategoryRepo?,
+    val paymentMethodRepo: PaymentMethodRepo?,
+    val incomeExpensesRepo: IncomeExpensesRepo?
+) : ViewModel() {
+
     var totalAmount: LiveData<Int>? = null
     var totalExpenses: LiveData<Int>? = null
     var totalIncome: LiveData<Int>? = null
     var incomeExpensesList: LiveData<List<IncomeExpensesEntity>>? = null
-
-
-    init {
-        val db = DatabaseHelper.initializeDB(application)
-        incomeExpensesRepo = IncomeExpensesRepo(db.incomeExpensesDao())
-    }
 
     fun insertRecord(incomeExpensesEntity: IncomeExpensesEntity) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -78,13 +77,71 @@ class IncomeExpensesViewModel(application: Application) : AndroidViewModel(appli
                 return totalIncome
             }
             1 -> {
-                totalExpenses =  incomeExpensesRepo?.getTotalAmount(viewType)
+                totalExpenses = incomeExpensesRepo?.getTotalAmount(viewType)
                 return totalExpenses
             }
         }
         return totalIncome
     }
 
+    private var incomeCategoryList: LiveData<List<IncomeCategoryEntity>>? = null
 
 
+
+    fun insertIncomeCategoryList(incomeCategoryEntity: List<IncomeCategoryEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            incomeCategoryRepo?.insertAllRecord(incomeCategoryEntity)
+        }
+    }
+
+    fun getIncomeCategoryList(): LiveData<List<IncomeCategoryEntity>>? {
+        incomeCategoryList = incomeCategoryRepo?.getIncomeCategory()
+        return incomeCategoryList
+    }
+
+
+    fun insertCategory(incomeCategoryEntity: IncomeCategoryEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            incomeCategoryRepo?.insertRecord(incomeCategoryEntity)
+        }
+    }
+
+    var expensesCategoryList: LiveData<List<ExpensesCategoryEntity>>? = null
+
+
+    fun insertExpensesCategoryList(expensesCategoryEntityList: List<ExpensesCategoryEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            expensesCategoryRepo?.insertAllRecord(expensesCategoryEntityList)
+        }
+    }
+
+    fun getExpensesCategoryAllList(): LiveData<List<ExpensesCategoryEntity>>? {
+
+        expensesCategoryList = expensesCategoryRepo?.getExpensesCategory()
+
+        return expensesCategoryList
+    }
+
+
+    fun insertCategory(expensesCategoryEntity: ExpensesCategoryEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            expensesCategoryRepo?.insertRecord(expensesCategoryEntity)
+        }
+    }
+
+    private var paymentMethodList: LiveData<List<PaymentMethodEntity>>? = null
+
+
+
+    fun insertPaymentMethodList(paymentMethodList: List<PaymentMethodEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            paymentMethodRepo?.insertPaymentMethod(paymentMethodList)
+        }
+
+    }
+
+    fun getAllPaymentMethodList(): LiveData<List<PaymentMethodEntity>>? {
+        paymentMethodList = paymentMethodRepo?.getPaymentData()
+        return paymentMethodList
+    }
 }

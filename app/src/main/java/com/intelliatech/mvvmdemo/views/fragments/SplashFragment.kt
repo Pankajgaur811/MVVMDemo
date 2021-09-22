@@ -3,13 +3,10 @@ package com.intelliatech.mvvmdemo.views.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.FragmentSplashBinding
@@ -17,17 +14,11 @@ import com.intelliatech.mvvmdemo.models.prefrencesManager.SharePreferenceManager
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.ExpensesCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeCategoryEntity
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
-import com.intelliatech.mvvmdemo.viewmodel.ExpensesCategoryVM
-import com.intelliatech.mvvmdemo.viewmodel.IncomeCategoryViewModel
-import com.intelliatech.mvvmdemo.viewmodel.PaymentVM
 
 class SplashFragment : Fragment() {
 
     private val TAG: String? = "SplashFragment"
     private lateinit var prefManager: SharePreferenceManager
-    private lateinit var paymentMethodViewModel: PaymentVM
-    private lateinit var expensesCategoryViewModel: ExpensesCategoryVM
-    private lateinit var incomeCategoryViewmodel: IncomeCategoryViewModel
     private lateinit var binding: FragmentSplashBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +31,7 @@ class SplashFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_splash, container, false)
+        binding = FragmentSplashBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -50,22 +41,19 @@ class SplashFragment : Fragment() {
         varInitialize()
 
 
-        if (!prefManager.getFirstLaunchStatus()) {
-            prefManager.setFirstLaunchStatus(true)
-            Log.d(TAG, "First time Data inserted")
-            insertIncomeCategoryData()
-            insertExpensesCategoryData()
-            insertPaymentMethodData()
-        }
+//        if (!prefManager.getFirstLaunchStatus()) {
+//            prefManager.setFirstLaunchStatus(true)
+//            Log.d(TAG, "First time Data inserted")
+//            insertIncomeCategoryData()
+//            insertExpensesCategoryData()
+//            insertPaymentMethodData()
+//        }
         gotoIncomeFragment()
     }
 
     private fun varInitialize() {
         prefManager = SharePreferenceManager(requireContext())
-        incomeCategoryViewmodel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
-        expensesCategoryViewModel =
-            ViewModelProvider(this).get(ExpensesCategoryVM::class.java)
-        paymentMethodViewModel = ViewModelProvider(this).get(PaymentVM::class.java)
+
     }
 
     private fun insertPaymentMethodData() {
@@ -87,7 +75,7 @@ class SplashFragment : Fragment() {
             paymentMethodEntity6
         )
 
-        paymentMethodViewModel.insertPaymentMethodList(paymentMethodList)
+//        paymentMethodViewModel.insertPaymentMethodList(paymentMethodList)
     }
 
     private fun insertExpensesCategoryData() {
@@ -102,7 +90,7 @@ class SplashFragment : Fragment() {
             expensesCategoryEntity4
 
         )
-        expensesCategoryViewModel.insertExpensesCategoryList(expensesCategoryList)
+//        expensesCategoryViewModel.insertExpensesCategoryList(expensesCategoryList)
     }
 
     private fun gotoIncomeFragment() {
@@ -110,7 +98,7 @@ class SplashFragment : Fragment() {
 
             try {
 
-                findNavController().navigate(R.id.action_splashFragment_to_incomeFragment)
+                findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
             } catch (illegalStateException: IllegalStateException) {
             }
         }, 3000) // 3000 is the delayed time in milliseconds.
@@ -128,7 +116,7 @@ class SplashFragment : Fragment() {
             incomeCategoryEntity3,
             incomeCategoryEntity4
         )
-        incomeCategoryViewmodel.insertIncomeCategoryList(incomeCategoryEntityList)
+//        incomeCategoryViewmodel.insertIncomeCategoryList(incomeCategoryEntityList)
     }
 
     companion object {
