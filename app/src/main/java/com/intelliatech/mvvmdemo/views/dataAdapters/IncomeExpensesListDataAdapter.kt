@@ -1,20 +1,23 @@
 package com.intelliatech.mvvmdemo.views.dataAdapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.intelliatech.mvvmdemo.databinding.SingleIncomeExpensesCardLayoutBinding
+import com.intelliatech.mvvmdemo.dependenciesInjection.container.ModuleProvider
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
-import com.intelliatech.mvvmdemo.models.utils.UtilityHelper
 import com.intelliatech.mvvmdemo.views.clickEventListeners.SingleClickEventList
+import org.koin.core.component.KoinApiExtension
 
+
+@KoinApiExtension
 class IncomeExpensesListDataAdapter(
-    context: Context,
-    var incomeExpensesEntityList: List<IncomeExpensesEntity>,
-    var singleClickEventList: SingleClickEventList
+    private var incomeExpensesEntityList: List<IncomeExpensesEntity>,
+    private val singleClickEventList: SingleClickEventList
 ) : RecyclerView.Adapter<IncomeExpensesListDataAdapter.IncomeExpensesListVH>() {
-    lateinit var binding: SingleIncomeExpensesCardLayoutBinding
+    private lateinit var binding: SingleIncomeExpensesCardLayoutBinding
+    private val component = ModuleProvider()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IncomeExpensesListVH {
 
         binding = SingleIncomeExpensesCardLayoutBinding.inflate(
@@ -25,9 +28,10 @@ class IncomeExpensesListDataAdapter(
         return IncomeExpensesListVH(binding)
     }
 
+    @KoinApiExtension
     override fun onBindViewHolder(holder: IncomeExpensesListVH, position: Int) {
         holder.binding.tvAmount.text = incomeExpensesEntityList.get(position).amount.toString()
-        var date = UtilityHelper.convertMiliSecondToDate(
+        val date = component.utilityHelper.convertMiliSecondToDate(
             "dd-MM-yyy",
             incomeExpensesEntityList.get(position).date.toLong()
         )
@@ -47,8 +51,7 @@ class IncomeExpensesListDataAdapter(
         return incomeExpensesEntityList.size
     }
 
-    class IncomeExpensesListVH(binding: SingleIncomeExpensesCardLayoutBinding) :
+    class IncomeExpensesListVH(var binding: SingleIncomeExpensesCardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        var binding: SingleIncomeExpensesCardLayoutBinding = binding
     }
 }

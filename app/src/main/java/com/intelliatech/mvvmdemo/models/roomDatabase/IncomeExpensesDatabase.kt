@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 @Database(
     entities = [IncomeCategoryEntity::class, ExpensesCategoryEntity::class, IncomeExpensesEntity::class, PaymentMethodEntity::class],
     version = 3,

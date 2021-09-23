@@ -11,40 +11,29 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.FragmentCreateBinding
+import com.intelliatech.mvvmdemo.dependenciesInjection.container.ModuleProvider
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
-import com.intelliatech.mvvmdemo.models.utils.MyApplication
-import com.intelliatech.mvvmdemo.models.utils.UtilityHelper
-import com.intelliatech.mvvmdemo.viewmodel.*
+import org.koin.core.component.KoinApiExtension
 import java.util.*
 
-
+@KoinApiExtension
 class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener, View.OnClickListener {
 
     private var incomeExpensesEntity: IncomeExpensesEntity? = null
-    private val incomeExpensesViewModel: IncomeExpensesViewModel by viewModels {
-        IncomeExpensesViewModelFactory(
-            MyApplication?.getAppInstance()?.incomeRepo,
-            MyApplication?.getAppInstance()?.expensesRepo,
-            MyApplication?.getAppInstance()?.paymentRepo,
-            MyApplication?.getAppInstance()?.incomeExpenseRepo
-        )
-
-    }
+    private val component = ModuleProvider()
 
     private var dateInMiliSecond: String = ""
     private var time: String = ""
     private var viewType: Int = 0
     private var isEdit = false
     private val args: CreateFragmentArgs by navArgs()
-    private val TAG: String? = "CreateFragment"
+    private val TAG: String = CreateFragment::class.java.simpleName
     private var paymentMode: String = ""
 
     //    private var paymentMethodList: MutableList<PaymentMethodEntity>? = null
@@ -62,9 +51,9 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        binding = FragmentCreateBinding.inflate(inflater,container, false)
+        binding = FragmentCreateBinding.inflate(inflater, container, false)
         viewType = args.viewType
         if (args.getData != null) {
             incomeExpensesEntity = args.getData
@@ -86,7 +75,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             Editable.Factory.getInstance().newEditable(incomeExpensesEntity?.time.toString())
         binding.etDate.text = Editable.Factory.getInstance().newEditable(
             incomeExpensesEntity?.date?.toLong()?.let {
-                UtilityHelper.convertMiliSecondToDate(
+                component.utilityHelper.convertMiliSecondToDate(
                     "dd-MM-yyyy",
                     it
                 )
@@ -144,20 +133,8 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             }
     }
 
-    private fun initVar() {
-
-//        incomeExpensesViewModel = ViewModelProvider(this).get(IncomeExpensesViewModel::class.java)
-//        incomeCategoryViewModel = ViewModelProvider(this).get(IncomeCategoryViewModel::class.java)
-//        paymentVM = ViewModelProvider(this).get(PaymentVM::class.java)
-//        expensesCategoryViewModel = ViewModelProvider(this).get(ExpensesCategoryVM::class.java)
-
-
-    }
-
     private fun initView() {
-        initVar()
         setClickListenersEvent()
-
         setScreenTitle()
         fetchData()
     }
@@ -171,7 +148,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 if (incomeExpensesEntity == null)
                     binding.tvScreenTitle.text = resources.getString(R.string.txt_income_fragment)
                 else {
-                    binding.tvScreenTitle.text = "Edit Income Record"
+                    binding.tvScreenTitle.text = getString(R.string.txt_edit_income_record)
                     setData(incomeExpensesEntity)
                 }
             }
@@ -182,7 +159,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 if (incomeExpensesEntity == null)
                     binding.tvScreenTitle.text = resources.getString(R.string.txt_expenses_fragment)
                 else {
-                    binding.tvScreenTitle.text = "Edit Expenses Record"
+                    binding.tvScreenTitle.text = getString(R.string.txt_edit_expenses_record)
                     setData(incomeExpensesEntity)
 
                 }
@@ -199,16 +176,6 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     }
 
-
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            CreateFragment().apply {
-                arguments = Bundle().apply {
-
-                }
-            }
-    }
 
     private fun showTimePicker() {
         val calendar: Calendar = Calendar.getInstance()
@@ -274,7 +241,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     private fun getPaymentMethodData() {
         context?.let {
-            incomeExpensesViewModel?.getAllPaymentMethodList()
+            component.incomeExpensesVM.getAllPaymentMethodList()
                 ?.observe(viewLifecycleOwner, Observer {
 
                     if (it != null) {
@@ -298,7 +265,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
     private fun getExpensesCategoryData() {
-        incomeExpensesViewModel?.getExpensesCategoryAllList()
+        component.incomeExpensesVM.getExpensesCategoryAllList()
             ?.observe(viewLifecycleOwner, Observer {
                 if (it != null) {
 
@@ -316,7 +283,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
     private fun getIncomeCategoryData() {
-        incomeExpensesViewModel?.getIncomeCategoryList()
+        component.incomeExpensesVM.getIncomeCategoryList()
             ?.observe(viewLifecycleOwner, Observer {
                 if (it != null) {
 
@@ -356,7 +323,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     }
 
     private fun deleteData() {
-        incomeExpensesEntity?.let { incomeExpensesViewModel?.deleteRecord(it) }
+        incomeExpensesEntity?.let { component.incomeExpensesVM.deleteRecord(it) }
         previousFragment()
     }
 
@@ -366,15 +333,8 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         }
     }
 
+
     private fun updatedData() {
-//        var incomeExpensesEntity = IncomeExpensesEntity(
-//            Integer.parseInt(binding.etAmount.text.toString()),
-//            binding.etPayer.text.toString(),
-//            binding.atvCategoryList.text.toString(),
-//            paymentMode, dateInMiliSecond, time, binding.etDescription.text.toString(), viewType
-//
-//
-//        )
 
         incomeExpensesEntity?.payment_method = paymentMode
         incomeExpensesEntity?.payer = binding.etPayer.text.toString()
@@ -385,9 +345,9 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         incomeExpensesEntity?.time = time
         incomeExpensesEntity?.type = viewType
 
-        var valueEffect =
+        val valueEffect =
             incomeExpensesEntity?.let {
-                incomeExpensesViewModel?.updateRecord(
+                component.incomeExpensesVM.updateRecord(
                     it
                 )
             }
@@ -399,14 +359,16 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         when (viewType) {
             0 -> {
                 try {
-                    Navigation.findNavController(binding.root).navigate(R.id.action_createFragment_to_incomeFragment)
+                    Navigation.findNavController(binding.root)
+                        .navigate(R.id.action_createFragment_to_incomeFragment)
                 } catch (e: Exception) {
                     Log.d(TAG, "excption :- ${e.message}")
                 }
             }
             1 -> {
                 try {
-                    Navigation.findNavController(binding.root).navigate(R.id.action_createFragment_to_expensesFragment2)
+                    Navigation.findNavController(binding.root)
+                        .navigate(R.id.action_createFragment_to_expensesFragment2)
                 } catch (e: Exception) {
                     Log.d(TAG, "excption :- ${e.message}")
                 }
@@ -428,7 +390,7 @@ class CreateFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             binding.atvCategoryList.text.toString(),
             paymentMode, dateInMiliSecond, time, binding.etDescription.text.toString(), viewType
         )
-        incomeExpensesViewModel?.insertRecord(incomeExpensesEntity)
+        component.incomeExpensesVM.insertRecord(incomeExpensesEntity)
         previousFragment()
     }
 

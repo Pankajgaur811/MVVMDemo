@@ -2,9 +2,9 @@ package com.intelliatech.mvvmdemo.models.repositories
 
 import androidx.lifecycle.LiveData
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.PaymentMethodEntity
-import com.intelliatech.mvvmdemo.models.roomDatabase.dao.PaymentMethodDAO
+import com.intelliatech.mvvmdemo.models.roomDatabase.IncomeExpensesDatabase
 
-class PaymentMethodRepo(private val paymentMethodDAO: PaymentMethodDAO) {
+class PaymentMethodRepo(private val db: IncomeExpensesDatabase) {
 
 
     var paymentMethodList: LiveData<List<PaymentMethodEntity>>? = null
@@ -12,12 +12,12 @@ class PaymentMethodRepo(private val paymentMethodDAO: PaymentMethodDAO) {
     suspend fun insertPaymentMethod(
         paymentMethodList: List<PaymentMethodEntity>
     ) {
-        paymentMethodDAO.insertAllPaymentMethod(paymentMethodList)
+        db.paymentMethodDao().insertAllPaymentMethod(paymentMethodList)
     }
 
 
     fun getPaymentData(): LiveData<List<PaymentMethodEntity>>? {
-        paymentMethodList = paymentMethodDAO.getAllPaymentMethod()
+        paymentMethodList = db.paymentMethodDao().getAllPaymentMethod()
         return paymentMethodList
     }
 

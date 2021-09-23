@@ -50,7 +50,7 @@
         android:id="@+id/expensesFragment2"
         android:name="com.intelliatech.mvvmdemo.views.fragments.ExpensesFragment"
         android:label="fragment_expenses"
-        tools:layout="@layout/fragment_expenses">
+        tools:layout="@layout/fragment_income">
         <action
             android:id="@+id/action_expensesFragment2_to_createFragment"
             app:destination="@id/createFragment" />
@@ -77,7 +77,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.intelliatech.mvvmdemo.views.fragments.HomeFragment"
-        android:label="HomeFragment" >
+        android:label="HomeFragment">
         <action
             android:id="@+id/action_homeFragment_to_createFragment"
             app:destination="@id/createFragment" />

@@ -10,4 +10,19 @@
     <string name="txt_search">Search</string>
     <string name="txt_income_fragment">Income</string>
     <string name="txt_expenses_fragment">Expenses</string>
+    <string name="screen_title">Screen Title</string>
+    <string name="txt_amount">Amount</string>
+    <string name="txt_payee_or_payer">Payee or Payer</string>
+    <string name="txt_category">Category</string>
+    <string name="txt_categ">cdv</string>
+    <string name="txt_date">Date</string>
+    <string name="txt_time">Time</string>
+    <string name="txt_description">Description</string>
+    <string name="txt_add">Add</string>
+    <string name="txt_delete_record">Delete Record</string>
+    <string name="txt_splash_incomeexpensesmanager">IncomeExpensesManager</string>
+    <string name="txt_from">From</string>
+    <string name="txt_to">To</string>
+    <string name="txt_edit_income_record">Edit Income Record</string>
+    <string name="txt_edit_expenses_record">Edit Expenses Record</string>
 </resources>

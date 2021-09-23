@@ -1,5 +1,6 @@
 package com.intelliatech.mvvmdemo.views.fragments
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.text.Editable
@@ -12,52 +13,41 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.intelliatech.mvvmdemo.R
 import com.intelliatech.mvvmdemo.databinding.FragmentIncomeBinding
+import com.intelliatech.mvvmdemo.dependenciesInjection.container.ModuleProvider
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
-import com.intelliatech.mvvmdemo.models.utils.MyApplication
-import com.intelliatech.mvvmdemo.viewmodel.IncomeExpensesViewModel
-import com.intelliatech.mvvmdemo.viewmodel.IncomeExpensesViewModelFactory
 import com.intelliatech.mvvmdemo.views.clickEventListeners.SingleClickEventList
 import com.intelliatech.mvvmdemo.views.dataAdapters.IncomeExpensesListDataAdapter
+import org.koin.core.component.KoinApiExtension
 import java.util.*
 
-
+@KoinApiExtension
 class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDateSetListener,
     SingleClickEventList {
     private var _binding: FragmentIncomeBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var start_date: String
-    private lateinit var end_date: String
+    private var startDate: String? = null
+    private var endDate: String? = null
     private var totalBalance: Int = 0
     private var totalIncome: Int = 0
     private var totalExpenses: Int = 0
 
     private var incomeRecordList = arrayListOf<IncomeExpensesEntity>()
-    private val TAG: String? = "IncomeFragment"
+    private val TAG: String = IncomeFragment::class.java.simpleName
     private var isSelected: Int = 0
     private val viewType: Int =
-        0//viewType vlaue set zero for get all income record list from database
+        0//viewType value set zero for get all income record list from database
     private var year: Int = 0
     private var day: Int = 0
     private var month: Int = 0
     private var incomeListAdapter: IncomeExpensesListDataAdapter? = null
 
-
-    private val incomeExpensesViewModel: IncomeExpensesViewModel by viewModels {
-        IncomeExpensesViewModelFactory(
-            MyApplication?.getAppInstance()?.incomeRepo,
-            MyApplication?.getAppInstance()?.expensesRepo,
-            MyApplication?.getAppInstance()?.paymentRepo,
-            MyApplication?.getAppInstance()?.incomeExpenseRepo
-        )
-
-    }
+    private val moduleProvider = ModuleProvider()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +61,7 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentIncomeBinding.inflate(inflater, container, false)
         initVar()
@@ -79,9 +69,6 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun initVar() {
-
-//        incomeExpensesViewModel = ViewModelProvider(this).get(IncomeExpensesViewModel::class.java)
-
         getTotalIncome()
         getTotalExpenses()
         fetchIncomeList()
@@ -94,10 +81,10 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun getTotalExpenses() {
-        incomeExpensesViewModel?.getTotalAmount(1)?.observe(viewLifecycleOwner,
-            androidx.lifecycle.Observer {
+        moduleProvider.incomeExpensesVM.getTotalAmount(1)?.observe(viewLifecycleOwner,
+            {
                 if (it != null) {
-                    Log.d(TAG, "total Income " + it)
+                    Log.d(TAG, "total Income $it")
                     binding.showStatus.tvTotalExpenses.text = it.toString()
                     totalExpenses = it
 
@@ -107,10 +94,10 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun getTotalIncome() {
-        incomeExpensesViewModel?.getTotalAmount(0)?.observe(viewLifecycleOwner,
-            androidx.lifecycle.Observer {
+        moduleProvider.incomeExpensesVM.getTotalAmount(0)?.observe(viewLifecycleOwner,
+            {
                 if (it != null) {
-                    Log.d(TAG, "total Income " + it)
+                    Log.d(TAG, "total Income $it")
                     binding.showStatus.tvTotalIncome.text = it.toString()
                     totalIncome = it
                 }
@@ -121,10 +108,10 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun fetchIncomeList() {
-        incomeExpensesViewModel?.getAllRecordList(viewType)?.observe(viewLifecycleOwner,
-            androidx.lifecycle.Observer {
+        moduleProvider.incomeExpensesVM.getAllRecordList(viewType)?.observe(viewLifecycleOwner,
+            {
                 if (it != null) {
-                    Log.d(TAG, "IncomeList data" + it.toString())
+                    Log.d(TAG, "IncomeList data$it")
                     setIncomeListAdapter(it)
                 } else
                     Log.d(TAG, "IncomeList data null")
@@ -135,18 +122,12 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     private fun setIncomeListAdapter(it: List<IncomeExpensesEntity>) {
         incomeRecordList.addAll(it)
         binding.rvList.layoutManager = LinearLayoutManager(requireContext())
-        incomeListAdapter = IncomeExpensesListDataAdapter(requireContext(), incomeRecordList, this)
+        incomeListAdapter = IncomeExpensesListDataAdapter(incomeRecordList, this)
         binding.rvList.adapter = incomeListAdapter
-        incomeListAdapter?.notifyDataSetChanged()
-
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-//        binding.tabLayout.tvIncomeFragment.background =
-//            resources.getDrawable(R.drawable.selected_tab_bg)
         setClickEvent()
     }
 
@@ -157,22 +138,6 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
         binding.sortingLayout.btnSearch.setOnClickListener(this)
         binding.sortingLayout.etStartDate.setOnClickListener(this)
         binding.sortingLayout.etEndDate.setOnClickListener(this)
-//        binding.tabLayout.tvIncomeFragment.setOnClickListener(this)
-//        binding.tabLayout.tvExpensesFragment.setOnClickListener(this)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * @return A new instance of fragment IncomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance() =
-            IncomeFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
     }
 
     override fun onDestroyView() {
@@ -182,17 +147,16 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun showSortingLayout() {
-        if (!!binding.checkbox.isChecked)
+        if (binding.checkbox.isChecked)
             binding.group.visibility = VISIBLE
         else {
             binding.group.visibility = GONE
         }
-
     }
 
     override fun onStop() {
         super.onStop()
-        if (binding.group.visibility === VISIBLE && binding.checkbox.isChecked) {
+        if (binding.group.visibility == VISIBLE && binding.checkbox.isChecked) {
             binding.group.visibility = GONE
         }
         incomeRecordList.clear()
@@ -223,7 +187,6 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
 
             R.id.tv_expenses_fragment ->
                 navigateExpensesFragment()
-
         }
     }
 
@@ -236,21 +199,17 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
         }
     }
 
-    private fun navigateIncomeFragment() {
-        TODO("Not yet implemented")
-    }
-
+    @SuppressLint("NotifyDataSetChanged")
     private fun showFilterRecord() {
-        if (start_date != null) {
-            if (end_date != null) {
-
-                incomeExpensesViewModel?.getDataBetweenTwoDates(
-                    start_date,
-                    end_date, viewType
+        if (startDate != null) {
+            if (endDate != null) {
+                moduleProvider.incomeExpensesVM.getDataBetweenTwoDates(
+                    startDate!!,
+                    endDate!!, viewType
 
                 )?.observe(viewLifecycleOwner,
-                    androidx.lifecycle.Observer {
-                        Log.d(TAG, "Sorted list :- " + it.toString())
+                    {
+                        Log.d(TAG, "Sorted list :- $it")
                         incomeRecordList.clear()
                         incomeRecordList.addAll(it)
                         incomeListAdapter?.notifyDataSetChanged()
@@ -265,7 +224,7 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun showDatePicker() {
-        Log.d("TAG", "show Date picker")
+        Log.d(TAG, "show Date picker")
         val calendar: Calendar = Calendar.getInstance()
         day = calendar.get(Calendar.DAY_OF_MONTH)
         month = calendar.get(Calendar.MONTH)
@@ -278,27 +237,17 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
     }
 
     private fun navigateCreateFragment() {
-//        val action =
-//            com.intelliatech.mvvmdemo.views.fragments.IncomeFragmentDirections.actionIncomeFragmentToCreateFragment()
-//                .setViewType(viewType)
-//        action.setGetData(null)
-//        Navigation.findNavController(binding.root).navigate(action)
-
-        //-----------------
-
         val action =
-            com.intelliatech.mvvmdemo.views.fragments.HomeFragmentDirections.actionHomeFragmentToCreateFragment()
-                .setViewType(viewType)
-        action.setGetData(null)
+            HomeFragmentDirections.actionHomeFragmentToCreateFragment().setViewType(viewType)
+        action.getData = null
         Navigation.findNavController(binding.root).navigate(action)
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         val calendar: Calendar = Calendar.getInstance()
         calendar.set(year, month, dayOfMonth)
-        var dateInMiliSecond = calendar.timeInMillis
-        var timeInMiliSecond = calendar.timeInMillis
-        var date = "$dayOfMonth - $month - $year"
+        val dateInMilliSecond = calendar.timeInMillis
+        val date = "$dayOfMonth - $month - $year"
 
         when (isSelected) {
 
@@ -306,32 +255,21 @@ class IncomeFragment : Fragment(), View.OnClickListener, DatePickerDialog.OnDate
                 binding.sortingLayout.etStartDate.text =
                     Editable.Factory.getInstance().newEditable(date)
                 isSelected = 0
-                start_date = dateInMiliSecond.toString()
+                startDate = dateInMilliSecond.toString()
             }
             2 -> {
                 isSelected = 0
                 binding.sortingLayout.etEndDate.text =
                     Editable.Factory.getInstance().newEditable(date)
-                end_date = dateInMiliSecond.toString()
+                endDate = dateInMilliSecond.toString()
             }
         }
     }
 
     override fun clickSingleRecordList(incomeExpensesEntity: IncomeExpensesEntity, view: View) {
-//        val action =
-//            com.intelliatech.mvvmdemo.views.fragments.IncomeFragmentDirections.actionIncomeFragmentToCreateFragment()
-//                .setViewType(viewType)
-//        action.setGetData(incomeExpensesEntity)
-//        Navigation.findNavController(binding.root).navigate(action)
-        //--------------------
-
-
         val action =
-            com.intelliatech.mvvmdemo.views.fragments.HomeFragmentDirections.actionHomeFragmentToCreateFragment()
-                .setViewType(viewType)
-        action.setGetData(incomeExpensesEntity)
+            HomeFragmentDirections.actionHomeFragmentToCreateFragment().setViewType(viewType)
+        action.getData = incomeExpensesEntity
         Navigation.findNavController(binding.root).navigate(action)
     }
-
-
 }

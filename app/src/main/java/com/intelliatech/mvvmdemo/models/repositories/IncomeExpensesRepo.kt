@@ -2,16 +2,16 @@ package com.intelliatech.mvvmdemo.models.repositories
 
 import androidx.lifecycle.LiveData
 import com.intelliatech.mvvmdemo.models.roomDatabase.Entity.IncomeExpensesEntity
-import com.intelliatech.mvvmdemo.models.roomDatabase.dao.IncomeExpensesDAO
+import com.intelliatech.mvvmdemo.models.roomDatabase.IncomeExpensesDatabase
 
-class IncomeExpensesRepo(private val incomeExpensesDAO: IncomeExpensesDAO) {
+class IncomeExpensesRepo(private val db: IncomeExpensesDatabase) {
 
     private var totalIncome: LiveData<Int>? = null
     private var totalExpenses: LiveData<Int>? = null
     var incomeExpensesList: LiveData<List<IncomeExpensesEntity>>? = null
 
     suspend fun insertRecord(incomeExpenses: IncomeExpensesEntity) {
-        incomeExpensesDAO.addRecord(incomeExpenses)
+        db.incomeExpensesDao().addRecord(incomeExpenses)
 
     }
 
@@ -21,28 +21,23 @@ class IncomeExpensesRepo(private val incomeExpensesDAO: IncomeExpensesDAO) {
         viewType: Int
     ): LiveData<List<IncomeExpensesEntity>>? {
         incomeExpensesList =
-            incomeExpensesDAO.getDataBetweenTwoDates(start_date, end_date, viewType)
+            db.incomeExpensesDao().getDataBetweenTwoDates(start_date, end_date, viewType)
         return incomeExpensesList
     }
 
 
     suspend fun updateRecord(incomeExpenses: IncomeExpensesEntity): Int {
-        var value = 0
-        value = incomeExpensesDAO.updateRecord(incomeExpenses)
 
-        return value
+        return  db.incomeExpensesDao().updateRecord(incomeExpenses)
     }
 
     suspend fun deleteRecord(incomeExpenses: IncomeExpensesEntity) {
-        incomeExpensesDAO.deleteRecord(incomeExpenses)
-
+        db.incomeExpensesDao().deleteRecord(incomeExpenses)
     }
 
     fun getIncomeExpensesRecordList(viewType: Int): LiveData<List<IncomeExpensesEntity>>? {
-
-        incomeExpensesList = incomeExpensesDAO.getAllIncomeExpensesRecordList(viewType)
+        incomeExpensesList = db.incomeExpensesDao().getAllIncomeExpensesRecordList(viewType)
         return incomeExpensesList
-
     }
 
     fun getTotalAmount(
@@ -50,11 +45,11 @@ class IncomeExpensesRepo(private val incomeExpensesDAO: IncomeExpensesDAO) {
     ): LiveData<Int>? {
         when (viewType) {
             0 -> {
-                totalIncome = incomeExpensesDAO.getTotalAmount(viewType)
+                totalIncome = db.incomeExpensesDao().getTotalAmount(viewType)
                 return totalIncome
             }
             1 -> {
-                totalExpenses = incomeExpensesDAO.getTotalAmount(viewType)
+                totalExpenses = db.incomeExpensesDao().getTotalAmount(viewType)
                 return totalExpenses
             }
         }
